@@ -6,7 +6,9 @@ import os
 # os.environ['http_proxy'] = 'http://127.0.0.1:2233/'
 # os.environ['https_proxy'] = 'http://127.0.0.1:2233/'
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = '1'  # 指定显卡
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+# 指定英伟达显卡
+# Specify the NVIDIA GPU to use
 
 GR_SHARE = True
 # 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
@@ -34,5 +36,11 @@ img_crop_center = dict(
     target_width=1024,  # 目标宽度
     target_height=576,  # 目标高度
 )
-# 因为往往在训练尺寸下的图片尺寸能达到比较好的效果,但是硬剪裁会扭曲图片，所以使用从中心剪裁
-# Because often, using images at training size can achieve better results, but hard cropping can distort the images, so we use center cropping.
+# 因为往往在训练尺寸下的图片尺寸能达到比较好的效果,但是硬剪裁会扭曲图片，所以使用从中心剪裁 Because often, using images at training size can achieve better
+# results, but hard cropping can distort the images, so we use center cropping.
+
+
+creat_video_by_opencv = False
+# 使用opencv生成视频, 但是发现会有一些编码的问题，所以默认关闭，默认使用moviepy
+# Use opencv to generate video, but it is found that there will be some encoding problems,
+# so it is turned off by default,default use moviepy

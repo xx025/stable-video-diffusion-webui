@@ -1,6 +1,9 @@
 from PIL import Image
+from moviepy.editor import ImageSequenceClip
+import imageio
 import os
-
+import numpy as np
+import shutil
 
 def auto_resize_image(input_path, output_path, max_width=1024, max_height=600):
     # 打开图片
@@ -25,6 +28,7 @@ def auto_resize_image(input_path, output_path, max_width=1024, max_height=600):
         # 保存缩放后的图片
         resized_image.save(output_path)
 
+
 def crop_center(image_path, output_path, target_width, target_height):
     # 打开图像
     image = Image.open(image_path)
@@ -47,7 +51,33 @@ def crop_center(image_path, output_path, target_width, target_height):
     # 保存裁剪并调整尺寸后的图像
     resized_image.save(output_path)
 
+
 def generate_autocut_filename(original_filename):
     base_name, extension = os.path.splitext(original_filename)
     new_filename = f"{base_name}_autocut{extension}"
     return new_filename
+
+
+
+
+
+def create_video(input_images, output_video_path, frames_per_second=30):
+    # Create a folder to store the frames
+    output_folder = "output_frames"
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Save the frames as images
+    for i, frame in enumerate(input_images):
+        frame_path = os.path.join(output_folder, f"frame_{i:06d}.png")
+        imageio.imwrite(frame_path, np.array(frame))
+
+    # Convert frames to video
+    # 使用MoviePy将图像序列合成成视频
+    clip = ImageSequenceClip(sorted([os.path.join(output_folder, frame) for frame in os.listdir(output_folder)]),
+                             fps=frames_per_second)
+    clip.write_videofile(output_video_path, codec="libx264")
+
+    # 删除保存的图片帧
+    shutil.rmtree(output_folder)
+
+    return output_video_path

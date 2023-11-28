@@ -2,10 +2,11 @@ from setting import GR_SHARE
 from setting import auth
 from setting import auto_adjust_img
 from setting import img_crop_center
+from setting import creat_video_by_opencv
 
 from img_tool import auto_resize_image as auto_resize_img
 from img_tool import generate_autocut_filename
-from img_tool import crop_center
+from img_tool import crop_center, create_video
 # if you want setting cuda device place ensure before 'from setting import *' position is first
 # 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
 
@@ -310,12 +311,6 @@ def sample(
                 os.makedirs(output_folder, exist_ok=True)
                 base_count = len(glob(os.path.join(output_folder, "*.mp4")))
                 video_path = os.path.join(output_folder, f"{base_count:06d}.mp4")
-                writer = cv2.VideoWriter(
-                    video_path,
-                    cv2.VideoWriter_fourcc(*"mp4v"),
-                    fps_id + 1,
-                    (samples.shape[-1], samples.shape[-2]),
-                )
 
                 samples = embed_watermark(samples)
                 samples = filter(samples)
@@ -325,10 +320,20 @@ def sample(
                     .numpy()
                     .astype(np.uint8)
                 )
-                for frame in vid:
-                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                    writer.write(frame)
-                writer.release()
+
+                if creat_video_by_opencv:
+                    writer = cv2.VideoWriter(
+                        video_path,
+                        cv2.VideoWriter_fourcc(*"mp4v"),
+                        fps_id + 1,
+                        (samples.shape[-1], samples.shape[-2]),
+                    )
+                    for frame in vid:
+                        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                        writer.write(frame)
+                    writer.release()
+                else:
+                    create_video(vid, video_path, fps_id + 1)
                 all_out_paths.append(video_path)
     return all_out_paths
 
@@ -363,7 +368,7 @@ else:
 with gr.Blocks(title='Stable Video Diffusion WebUI') as demo:
     with gr.Row():
         image = gr.Image(label="input image", type="filepath")
-        video_out = gr.File(label="generated video")
+        video_out = gr.Video(label="generated video")
     with gr.Column():
         resize_image = gr.Checkbox(label="resize to optimal size/自动剪裁图片尺寸", value=True)
         btn = gr.Button("Run")
@@ -373,7 +378,7 @@ with gr.Blocks(title='Stable Video Diffusion WebUI') as demo:
             seed = gr.Text(value="random", label="seed (integer or 'random')", )
             decoding_t = gr.Number(precision=0, label="number of frames decoded at a time", value=2)
     examples = [
-        ["https://user-images.githubusercontent.com/33302880/284758167-367a25d8-8d7b-42d3-8391-6d82813c7b0f.png"]
+        ["https://raw.githubusercontent.com/xx025/stable-video-diffusion-webui/main/demo.jpeg"]
     ]
     inputs = [image, resize_image, n_frames, n_steps, seed, decoding_t]
     outputs = [video_out]
