@@ -360,7 +360,7 @@ else:
     auth = None
     auth_message = ''
 
-with gr.Blocks() as demo:
+with gr.Blocks(title='Stable Video Diffusion WebUI') as demo:
     with gr.Row():
         image = gr.Image(label="input image", type="filepath")
         video_out = gr.File(label="generated video")
