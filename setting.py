@@ -19,3 +19,12 @@ auth = dict(
 )
 # 设置用户名何密码， 如果你不想设置请注释掉
 # set username and password， if you don't want to set it, please comment it out
+
+
+# 自动调整图片分辨率
+# Automatically adjust the resolution of the picture
+auto_adjust_img = dict(
+    enable=True,
+    max_height=1024,  # 图片最大宽度
+    max_width=1024,  # 图片最大高度
+)

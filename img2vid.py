@@ -1,5 +1,9 @@
 from setting import GR_SHARE
 from setting import auth
+from setting import auto_adjust_img
+
+from img_tool import auto_resize_image as auto_resize_img
+from img_tool import generate_autocut_filename
 # if you want setting cuda device place ensure before 'from setting import *' position is first
 # 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
 
@@ -153,6 +157,13 @@ def sample(
     image file in folder `input_path`. If you run out of VRAM, try decreasing `decoding_t`.
     """
     torch.manual_seed(seed)
+
+    if auto_adjust_img.get('enable', False):  # 自动调整图片分辨率
+        max_width = auto_adjust_img.get('max_width', 1024)
+        max_height = auto_adjust_img.get('max_height', 1000)
+        resized_output_path = generate_autocut_filename(input_path)
+        auto_resize_img(input_path, resized_output_path, max_width=max_width, max_height=max_height)
+        input_path = resized_output_path
 
     path = Path(input_path)
     all_img_paths = []
