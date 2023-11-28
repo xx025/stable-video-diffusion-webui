@@ -24,8 +24,8 @@ auth = dict(
 
 auto_adjust_img = dict(
     enable=True,
-    max_height=1024,  # 图片最大宽度
-    max_width=1024,  # 图片最大高度
+    max_height=960,  # 图片最大宽度
+    max_width=960,  # 图片最大高度
 )
 # 自动调整图片分辨率
 # Automatically adjust the resolution of the picture
