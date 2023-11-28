@@ -1,9 +1,11 @@
 from setting import GR_SHARE
 from setting import auth
 from setting import auto_adjust_img
+from setting import img_crop_center
 
 from img_tool import auto_resize_image as auto_resize_img
 from img_tool import generate_autocut_filename
+from img_tool import crop_center
 # if you want setting cuda device place ensure before 'from setting import *' position is first
 # 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
 
@@ -158,11 +160,19 @@ def sample(
     """
     torch.manual_seed(seed)
 
-    if auto_adjust_img.get('enable', False):  # 自动调整图片分辨率
+    if not resize_image and auto_adjust_img.get('enable', True):
+        # 自动调整图片分辨率,如果不开启resize_image,则自动调整图片分辨率
         max_width = auto_adjust_img.get('max_width', 1024)
         max_height = auto_adjust_img.get('max_height', 1000)
         resized_output_path = generate_autocut_filename(input_path)
         auto_resize_img(input_path, resized_output_path, max_width=max_width, max_height=max_height)
+        input_path = resized_output_path
+
+    if resize_image and img_crop_center.get('enable', True):
+        resized_output_path = generate_autocut_filename(input_path)
+        target_width = img_crop_center.get('target_width', 1024)
+        target_height = img_crop_center.get('target_height', 576)
+        crop_center(input_path, resized_output_path, target_width=target_width, target_height=target_height)
         input_path = resized_output_path
 
     path = Path(input_path)
@@ -355,7 +365,7 @@ with gr.Blocks() as demo:
         image = gr.Image(label="input image", type="filepath")
         video_out = gr.File(label="generated video")
     with gr.Column():
-        resize_image = gr.Checkbox(label="resize to optimal size", value=True)
+        resize_image = gr.Checkbox(label="resize to optimal size/自动剪裁图片尺寸", value=True)
         btn = gr.Button("Run")
         with gr.Accordion(label="Advanced options", open=False):
             n_frames = gr.Number(precision=0, label="number of frames", value=num_frames)

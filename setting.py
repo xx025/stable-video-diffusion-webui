@@ -20,11 +20,19 @@ auth = dict(
 # 设置用户名何密码， 如果你不想设置请注释掉
 # set username and password， if you don't want to set it, please comment it out
 
-
-# 自动调整图片分辨率
-# Automatically adjust the resolution of the picture
 auto_adjust_img = dict(
     enable=True,
     max_height=1024,  # 图片最大宽度
     max_width=1024,  # 图片最大高度
 )
+# 自动调整图片分辨率
+# Automatically adjust the resolution of the picture
+
+
+img_crop_center = dict(
+    enable=True,
+    target_width=1024,  # 目标宽度
+    target_height=576,  # 目标高度
+)
+# 因为往往在训练尺寸下的图片尺寸能达到比较好的效果,但是硬剪裁会扭曲图片，所以使用从中心剪裁
+# Because often, using images at training size can achieve better results, but hard cropping can distort the images, so we use center cropping.
