@@ -378,7 +378,7 @@ with gr.Blocks(title='Stable Video Diffusion WebUI') as demo:
             seed = gr.Text(value="random", label="seed (integer or 'random')", )
             decoding_t = gr.Number(precision=0, label="number of frames decoded at a time", value=2)
     examples = [
-        ["https://raw.githubusercontent.com/xx025/stable-video-diffusion-webui/main/demo.jpeg"]
+        ["https://raw.githubusercontent.com/xx025/stable-video-diffusion-webui/main/demo/demo.jpeg"]
     ]
     inputs = [image, resize_image, n_frames, n_steps, seed, decoding_t]
     outputs = [video_out]
