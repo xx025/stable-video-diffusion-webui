@@ -15,16 +15,24 @@ gradio_args = dict(
     share=True,
     # 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
     # generate a gradio share link, you can access it through the gradio website
-    show_api=True,  # 显示api 信息 show api information
+    auth=dict(
+        # username='root',
+        # password='123456',
+        message='Place enter your username and password; 请输入用户名何密码'
+    ),
+    # 设置用户名何密码， 如果你不想设置请注释掉
+    # set username and password， if you don't want to set it, please comment it out
+    head_html="""
+            <div style="text-align: center;line-height:0">
+                <h1>Stable Video Diffusion WebUI</h1>
+                <p>Upload an image to create a Video with the image.</p>
+            </div>
+            """,
+    # 设置gradio的头部信息
+    # Set the header information of gradio
+    show_api=True,
+    # 显示api 信息 show api information
 )
-
-auth = dict(
-    # USER_NAME='root',
-    # PASSWORD='123456',
-    AUTH_MESSAGE='Place enter your username and password; 请输入用户名何密码',
-)
-# 设置用户名何密码， 如果你不想设置请注释掉
-# set username and password， if you don't want to set it, please comment it out
 
 auto_adjust_img = dict(
     min_width=256,  # 图片最小宽度 Image minimum width
@@ -50,13 +58,3 @@ creat_video_by_opencv = False
 # 使用opencv生成视频, 但是发现会有一些编码的问题，所以默认关闭，默认使用moviepy
 # Use opencv to generate video, but it is found that there will be some encoding problems,
 # so it is turned off by default,default use moviepy
-
-
-HEAD_HTML = """
-            <div style="text-align: center;line-height:0">
-                <h1>Stable Video Diffusion WebUI</h1>
-                <p>Upload an image to create a Video with the image.</p>
-            </div>
-            """
-# 设置gradio的头部信息
-# Set the header information of gradio

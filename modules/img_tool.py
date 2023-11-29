@@ -1,3 +1,4 @@
+import cv2
 from PIL import Image
 from moviepy.editor import ImageSequenceClip
 import imageio
@@ -104,10 +105,12 @@ def crop_center_resize(image: Image, target_width, target_height) -> Image:
     resized_image = cropped_image.resize((target_width, target_height))
     return resized_image
 
+
 def generate_autocut_filename(original_filename):
     base_name, extension = os.path.splitext(original_filename)
     new_filename = f"{base_name}_autocut{extension}"
     return new_filename
+
 
 def create_video(input_images, output_video_path, frames_per_second=30):
     # Create a folder to store the frames
@@ -129,3 +132,4 @@ def create_video(input_images, output_video_path, frames_per_second=30):
     shutil.rmtree(output_folder)
 
     return output_video_path
+

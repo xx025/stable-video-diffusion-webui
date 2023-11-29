@@ -1,100 +1,24 @@
-from setting import img_resize_to_HW, auto_adjust_img, HEAD_HTML
-from setting import auth
-from setting import creat_video_by_opencv
-from setting import gradio_args
-# if you want setting cuda device place ensure before 'from setting import *' position is first
-# 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
-
 import math
 import os
 import random
-import shutil
-import sys
 from glob import glob
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 import cv2
-import gradio as gr
 import numpy as np
 import torch
-from PIL import Image
 from einops import rearrange, repeat
-from omegaconf import OmegaConf
-from scripts.util.detection.nsfw_and_watermark_dectection import DeepFloydDataFiltering
-from scripts.util.detection.nsfw_and_watermark_dectection import RESOURCES_ROOT
 from sgm.inference.helpers import embed_watermark
-from sgm.util import instantiate_from_config
+from torch import Tensor
 from torchvision.transforms import ToTensor
-from torchvision.transforms import functional as TF
 
-from img_tool import create_video, crop_center_resize, generate_autocut_filename
-from img_tool import enlarge_image, shrink_image, crop_to_nearest_multiple_of_n, \
+from modules.img_tool import create_video, crop_center_resize
+from modules.img_tool import enlarge_image, shrink_image, crop_to_nearest_multiple_of_n, \
     image_pipeline_func
-
-
-# 移动必要的文件
-# move must have files
-if not os.path.exists(RESOURCES_ROOT):
-    os.makedirs(RESOURCES_ROOT)
-f_real = os.path.join('generative-models', RESOURCES_ROOT)
-files = ['p_head_v1.npz', 'w_head_v1.npz']
-for f in files:
-    if not os.path.exists(os.path.join(RESOURCES_ROOT, f)):
-        shutil.copy(os.path.join(f_real, f), os.path.join(RESOURCES_ROOT, f))
-
-sys.path.append("generative-models")
-
-
-def load_model(
-        config: str,
-        device: str,
-        num_frames: int,
-        num_steps: int, ):
-    config = OmegaConf.load(config)
-    config.model.params.conditioner_config.params.emb_models[
-        0
-    ].params.open_clip_embedding_config.params.init_device = device
-    config.model.params.sampler_config.params.num_steps = num_steps
-    config.model.params.sampler_config.params.guider_config.params.num_frames = (
-        num_frames
-    )
-    with torch.device(device):
-        model = instantiate_from_config(config.model).to(device).eval().requires_grad_(False)
-
-    filter = DeepFloydDataFiltering(verbose=False, device=device)
-    return model, filter
-
-
-version = "svd_xt"  # @param ["svd", "svd_xt"]
-
-if version == "svd":
-    num_frames = 14
-    num_steps = 25
-    # output_folder = default(output_folder, "outputs/simple_video_sample/svd/")
-    model_config = "generative-models/scripts/sampling/configs/svd.yaml"
-elif version == "svd_xt":
-    num_frames = 25
-    num_steps = 30
-    # output_folder = default(output_folder, "outputs/simple_video_sample/svd_xt/")
-    model_config = "generative-models/scripts/sampling/configs/svd_xt.yaml"
-else:
-    raise ValueError(f"Version {version} does not exist.")
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, filter = load_model(
-    model_config,
-    device,
-    num_frames,
-    num_steps,
-)
-# move models expect unet to cpu
-model.conditioner.cpu()
-model.first_stage_model.cpu()
-# change the dtype of unet
-model.model.to(dtype=torch.float16)
-torch.cuda.empty_cache()
-model = model.requires_grad_(False)
+from modules.model_setting import device, model, filter_x
+from setting import creat_video_by_opencv
+from setting import img_resize_to_HW, auto_adjust_img
 
 
 def get_unique_embedder_keys_from_conditioner(conditioner):
@@ -103,7 +27,7 @@ def get_unique_embedder_keys_from_conditioner(conditioner):
 
 def get_batch(keys, value_dict, N, T, device, dtype=None):
     batch = {}
-    batch_uc = {}
+    batch_uc: dict[str | Any, Tensor] = {}
 
     for key in keys:
         if key == "fps_id":
@@ -160,7 +84,6 @@ def sample(
     image file in folder `input_path`. If you run out of VRAM, try decreasing `decoding_t`.
     """
     torch.manual_seed(seed)
-
     path = Path(input_path)
     all_img_paths = []
     if path.is_file():
@@ -182,13 +105,12 @@ def sample(
         raise ValueError
     all_out_paths = []
     for input_img_path in all_img_paths:
-
         # 图片数据管道，在这里会进行一些图片的预处理，比如缩放，剪裁等
         # Image data pipeline, some image preprocessing will be done here, such as scaling, cropping, etc.
         min_W, min_H = auto_adjust_img.get('min_width', 256), auto_adjust_img.get('min_height', 256)
         max_W, max_H = auto_adjust_img.get('max_width', 1024), auto_adjust_img.get('max_height', 1024)
         re_W, re_H = img_resize_to_HW.get(' target_width', 1024), img_resize_to_HW.get('target_height', 576)
-        multiple_of_N=img_resize_to_HW.get('multiple_of_N',64)
+        multiple_of_N = img_resize_to_HW.get('multiple_of_N', 64)
         processing_functions = [
             {"func": enlarge_image, "args": (min_H, min_W)},
             {"func": shrink_image, "args": (max_W, max_H)},
@@ -198,27 +120,11 @@ def sample(
         if resize_image and image.size != (re_W, re_H):
             image = crop_center_resize(image, target_width=re_W, target_height=re_H)
 
-        new_path = generate_autocut_filename(input_img_path)
-        image.save(fp=new_path)
-        input_img_path = new_path
+        if image.mode == "RGBA":
+            image = image.convert("RGB")
 
-        with Image.open(input_img_path) as image:
-            if image.mode == "RGBA":
-                image = image.convert("RGB")
-            if resize_image and image.size != (1024, 576):
-                print(f"Resizing {image.size} to (1024, 576)")
-                image = TF.resize(TF.resize(image, 1024), (576, 1024))
-            w, h = image.size
-
-            if h % 64 != 0 or w % 64 != 0:
-                width, height = map(lambda x: x - x % 64, (w, h))
-                image = image.resize((width, height))
-                print(
-                    f"WARNING: Your image is of size {h}x{w} which is not divisible by 64. We are resizing to {height}x{width}!"
-                )
-
-            image = ToTensor()(image)
-            image = image * 2.0 - 1.0
+        image = ToTensor()(image)
+        image = image * 2.0 - 1.0
 
         image = image.unsqueeze(0).to(device)
         H, W = image.shape[2:]
@@ -226,6 +132,7 @@ def sample(
         F = 8
         C = 4
         shape = (num_frames, C, H // F, W // F)
+
         if (H, W) != (576, 1024):
             print(
                 "WARNING: The conditioning frame you provided is not 576x1024. This leads to suboptimal performance as model was only trained on 576x1024. Consider increasing `cond_aug`."
@@ -247,7 +154,7 @@ def sample(
         value_dict["cond_aug"] = cond_aug
         value_dict["cond_frames_without_noise"] = image
         value_dict["cond_frames"] = image + cond_aug * torch.randn_like(image)
-        value_dict["cond_aug"] = cond_aug
+
         # low vram mode
         model.conditioner.cpu()
         model.first_stage_model.cpu()
@@ -286,11 +193,8 @@ def sample(
                     c[k] = c[k].to(dtype=torch.float16)
 
                 randn = torch.randn(shape, device=device, dtype=torch.float16)
-
                 additional_model_inputs = {}
-                additional_model_inputs["image_only_indicator"] = torch.zeros(
-                    2, num_frames
-                ).to(device, )
+                additional_model_inputs["image_only_indicator"] = torch.zeros(2, num_frames).to(device, )
                 additional_model_inputs["num_video_frames"] = batch["num_video_frames"]
 
                 for k in additional_model_inputs:
@@ -304,7 +208,6 @@ def sample(
 
                 samples_z = model.sampler(denoiser, randn, cond=c, uc=uc)
                 samples_z.to(dtype=model.first_stage_model.dtype)
-                ##
 
                 model.en_and_decode_n_samples_a_time = decoding_t
                 model.first_stage_model.to(device)
@@ -318,7 +221,7 @@ def sample(
                 video_path = os.path.join(output_folder, f"{base_count:06d}.mp4")
 
                 samples = embed_watermark(samples)
-                samples = filter(samples)
+                samples = filter_x(samples)
                 vid = (
                     (rearrange(samples, "t c h w -> t h w c") * 255)
                     .cpu()
@@ -361,40 +264,3 @@ def infer(input_path: str, resize_image: bool, n_frames: int, n_steps: int, seed
         output_folder='content/outputs'  # 修改路径
     )
     return output_paths[0]
-
-
-if 'USER_NAME' in auth and 'PASSWORD' in auth:
-    auth_message = auth.get('AUTH_MESSAGE', '')
-    auth = (auth['USER_NAME'], auth['PASSWORD'])
-else:
-    auth = None
-    auth_message = ''
-
-with gr.Blocks(title='Stable Video Diffusion WebUI', css='assets/style_custom.css') as demo:
-    gr.HTML(HEAD_HTML)  # add head html
-    with gr.Row():
-        image = gr.Image(label="input image", type="filepath", elem_id='img-box')
-        video_out = gr.Video(label="generated video", elem_id='video-box')
-    with gr.Column():
-        resize_image = gr.Checkbox(label="resize to optimal size/自动剪裁图片尺寸", value=True)
-        btn = gr.Button("Run")
-        with gr.Accordion(label="Advanced options", open=False):
-            n_frames = gr.Number(precision=0, label="number of frames", value=num_frames)
-            n_steps = gr.Number(precision=0, label="number of steps", value=num_steps)
-            seed = gr.Text(value="random", label="seed (integer or 'random')", )
-            decoding_t = gr.Number(precision=0, label="number of frames decoded at a time", value=2)
-    examples = [
-        ["https://raw.githubusercontent.com/xx025/stable-video-diffusion-webui/main/demo/demo.jpeg"]
-    ]
-    inputs = [image, resize_image, n_frames, n_steps, seed, decoding_t]
-    outputs = [video_out]
-    btn.click(infer, inputs=inputs, outputs=outputs)
-    gr.Examples(examples=examples, inputs=inputs, outputs=outputs, fn=infer)
-    demo.queue().launch(
-        debug=True,
-        auth=auth,
-        auth_message=auth_message,
-        share=gradio_args.get('share', True),
-        show_api=gradio_args.get('show_api', True),
-        show_error=True,
-    )
