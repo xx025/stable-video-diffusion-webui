@@ -24,8 +24,8 @@ cd stable-video-diffusion-webui
 Before starting, you need to create a virtual environment. It is recommended to use conda. If you are not comfortable using conda, create a Python 3.10 environment in your own way.
 
 ```shell
-conda create -n modules python=3.10 
-conda activate modules
+conda create -n svd python=3.10 
+conda activate svd
 ```
 
 Then execute the following commands in order,
