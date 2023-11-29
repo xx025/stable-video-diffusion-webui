@@ -47,13 +47,14 @@ wget https://huggingface.co/vdo/stable-video-diffusion-img2vid-xt/resolve/main/s
 During the first run, other model files will be downloaded.
 
 ```shell
-python img2vid.py
+python run.py
 ```
 
 ## More setting
 
 Please check settings.py and make modifications.
 
+---
 
 ![image](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/ced032dd-3dda-4440-b72e-3f281d146e56)
 
