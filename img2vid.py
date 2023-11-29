@@ -365,10 +365,10 @@ else:
     auth = None
     auth_message = ''
 
-with gr.Blocks(title='Stable Video Diffusion WebUI') as demo:
+with gr.Blocks(title='Stable Video Diffusion WebUI',css='assets/style_custom.css') as demo:
     with gr.Row():
-        image = gr.Image(label="input image", type="filepath",height=300)
-        video_out = gr.Video(label="generated video",height=300)
+        image = gr.Image(label="input image", type="filepath", elem_id='img-box')
+        video_out = gr.Video(label="generated video", elem_id='video-box')
     with gr.Column():
         resize_image = gr.Checkbox(label="resize to optimal size/自动剪裁图片尺寸", value=True)
         btn = gr.Button("Run")

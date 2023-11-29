@@ -1,0 +1,17 @@
+
+:root {
+    --box-height: 300px;
+}
+
+
+#video-box {
+    height: var(--box-height);
+}
+
+#img-box {
+    height: var(--box-height);
+}
+
+#video-box video {
+    height: var(--box-height);
+}
