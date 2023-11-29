@@ -53,7 +53,52 @@ wget https://huggingface.co/vdo/stable-video-diffusion-img2vid-xt/resolve/main/s
 python img2vid.py
 ```
 
-如果你希望设置密码，请移步到`seeting.py` 更改
+
+
+
+## 个性化设置
+
+请移步到`seeting.py` 更改
+
+```python
+# 首次运行需要从Hugging Face下载ClIP模型等 也需要设置代理
+# 设置自己的 http代理
+# This config about proxy only for China
+# os.environ['http_proxy'] = 'http://127.0.0.1:2233/'
+# os.environ['https_proxy'] = 'http://127.0.0.1:2233/'
+
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+# 指定英伟达显卡
+
+GR_SHARE = True
+# 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
+
+auth = dict(
+    # USER_NAME='root',
+    # PASSWORD='123456',
+    AUTH_MESSAGE='Place enter your username and password; 请输入用户名何密码',
+)
+# 设置用户名何密码， 如果你不想设置请注释掉
+
+auto_adjust_img = dict(
+    min_width=256,  # 图片最小宽度 Image minimum width
+    min_height=256,  # 图片最小高度 Image minimum height
+    max_height=1024,  # 图片最大宽度 Image maximum width
+    max_width=1024,  # 图片最大高度 Image maximum height
+    multiple_of_N=16  # 图片的宽高必须是N的倍数 The width and height of the image must be a multiple of N
+)
+# 自动调整图片分辨率,自动调整到符合要求的分辨率
+
+img_resize_to_HW = dict(
+    target_width=1024,  # 目标宽度
+    target_height=576,  # 目标高度
+)
+# 因为往往在训练尺寸下的图片尺寸能达到比较好的效果,但是硬剪裁会扭曲图片，所以使用从中心剪裁
+
+creat_video_by_opencv = False
+# 使用opencv生成视频, 但是发现会有一些编码的问题，所以默认关闭，默认使用moviepy
+```
+
 
 
 ![image](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/ced032dd-3dda-4440-b72e-3f281d146e56)
