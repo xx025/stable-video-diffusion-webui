@@ -56,6 +56,9 @@ python run.py
 
 请查看`setting.py` 并修改
 
+
+---
+
 ![image](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/ced032dd-3dda-4440-b72e-3f281d146e56)
 
 
