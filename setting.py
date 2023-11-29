@@ -12,7 +12,7 @@ import os
 
 
 gradio_args = dict(
-    share_url=True,
+    share=True,
     # 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
     # generate a gradio share link, you can access it through the gradio website
     show_api=True,  # 显示api 信息 show api information
