@@ -1,19 +1,12 @@
-from setting import GR_SHARE
+from setting import GR_SHARE, img_resize_to_HW, auto_adjust_img
 from setting import auth
-from setting import auto_adjust_img
-from setting import img_crop_center
 from setting import creat_video_by_opencv
-
-from img_tool import auto_resize_image as auto_resize_img
-from img_tool import generate_autocut_filename
-from img_tool import crop_center, create_video
 # if you want setting cuda device place ensure before 'from setting import *' position is first
 # 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
 
-import gradio as gr
-import random
 import math
 import os
+import random
 import shutil
 import sys
 from glob import glob
@@ -21,6 +14,7 @@ from pathlib import Path
 from typing import Optional
 
 import cv2
+import gradio as gr
 import numpy as np
 import torch
 from PIL import Image
@@ -32,6 +26,11 @@ from sgm.inference.helpers import embed_watermark
 from sgm.util import instantiate_from_config
 from torchvision.transforms import ToTensor
 from torchvision.transforms import functional as TF
+
+from img_tool import create_video, crop_center_resize, generate_autocut_filename
+from img_tool import enlarge_image, shrink_image, crop_to_nearest_multiple_of_n, \
+    image_pipeline_func
+
 
 # 移动必要的文件
 # move must have files
@@ -161,21 +160,6 @@ def sample(
     """
     torch.manual_seed(seed)
 
-    if not resize_image and auto_adjust_img.get('enable', True):
-        # 自动调整图片分辨率,如果不开启resize_image,则自动调整图片分辨率
-        max_width = auto_adjust_img.get('max_width', 1024)
-        max_height = auto_adjust_img.get('max_height', 1000)
-        resized_output_path = generate_autocut_filename(input_path)
-        auto_resize_img(input_path, resized_output_path, max_width=max_width, max_height=max_height)
-        input_path = resized_output_path
-
-    if resize_image and img_crop_center.get('enable', True):
-        resized_output_path = generate_autocut_filename(input_path)
-        target_width = img_crop_center.get('target_width', 1024)
-        target_height = img_crop_center.get('target_height', 576)
-        crop_center(input_path, resized_output_path, target_width=target_width, target_height=target_height)
-        input_path = resized_output_path
-
     path = Path(input_path)
     all_img_paths = []
     if path.is_file():
@@ -197,6 +181,25 @@ def sample(
         raise ValueError
     all_out_paths = []
     for input_img_path in all_img_paths:
+
+        # 图片数据管道，在这里会进行一些图片的预处理，比如缩放，剪裁等
+        # Image data pipeline, some image preprocessing will be done here, such as scaling, cropping, etc.
+        min_W, min_H = auto_adjust_img.get('min_width', 256), auto_adjust_img.get('min_height', 256)
+        max_W, max_H = auto_adjust_img.get('max_width', 1024), auto_adjust_img.get('max_height', 1024)
+        re_W, re_H = img_resize_to_HW.get(' target_width', 1024), img_resize_to_HW.get('target_height', 576)
+        processing_functions = [
+            {"func": enlarge_image, "args": (min_H, min_W)},
+            {"func": shrink_image, "args": (max_W, max_H)},
+            {"func": crop_to_nearest_multiple_of_n, "args": (16,)},
+        ]
+        image = image_pipeline_func(input_img_path, processing_functions)
+        if resize_image and image.size != (re_W, re_H):
+            image = crop_center_resize(image, target_width=re_W, target_height=re_H)
+
+        new_path = generate_autocut_filename(input_img_path)
+        image.save(fp=new_path)
+        input_img_path = new_path
+
         with Image.open(input_img_path) as image:
             if image.mode == "RGBA":
                 image = image.convert("RGB")
@@ -365,7 +368,7 @@ else:
     auth = None
     auth_message = ''
 
-with gr.Blocks(title='Stable Video Diffusion WebUI',css='assets/style_custom.css') as demo:
+with gr.Blocks(title='Stable Video Diffusion WebUI', css='assets/style_custom.css') as demo:
     with gr.Row():
         image = gr.Image(label="input image", type="filepath", elem_id='img-box')
         video_out = gr.Video(label="generated video", elem_id='video-box')
