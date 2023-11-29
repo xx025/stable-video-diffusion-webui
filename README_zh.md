@@ -22,8 +22,8 @@ cd stable-video-diffusion-webui
 如果你不方便使用 conda 请用自己的方式创建一个 python3.10 版本的环境
 
 ```shell
-conda create -n modules python=3.10 
-conda activate modules
+conda create -n svd python=3.10 
+conda activate svd
 ```
 
 然后依次执行以下命令，
