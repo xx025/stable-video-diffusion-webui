@@ -10,9 +10,13 @@ import os
 # 指定英伟达显卡
 # Specify the NVIDIA GPU to use
 
-GR_SHARE = True
-# 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
-# generate a gradio share link, you can access it through the gradio website
+
+gradio_args = dict(
+    share_url=True,
+    # 产生一个gradio 的分享链接，可以通过gradio的网站进行访问
+    # generate a gradio share link, you can access it through the gradio website
+    show_api=True,  # 显示api 信息 show api information
+)
 
 auth = dict(
     # USER_NAME='root',
@@ -27,7 +31,7 @@ auto_adjust_img = dict(
     min_height=256,  # 图片最小高度 Image minimum height
     max_height=1024,  # 图片最大宽度 Image maximum width
     max_width=1024,  # 图片最大高度 Image maximum height
-    multiple_of_N=16  # 图片的宽高必须是N的倍数 The width and height of the image must be a multiple of N
+    multiple_of_N=64  # 图片的宽高必须是N的倍数 The width and height of the image must be a multiple of N
 )
 # 自动调整图片分辨率,自动调整到符合要求的分辨率
 # Automatically adjust the image resolution, automatically adjust to the resolution that meets the requirements
@@ -46,3 +50,13 @@ creat_video_by_opencv = False
 # 使用opencv生成视频, 但是发现会有一些编码的问题，所以默认关闭，默认使用moviepy
 # Use opencv to generate video, but it is found that there will be some encoding problems,
 # so it is turned off by default,default use moviepy
+
+
+HEAD_HTML = """
+            <div style="text-align: center;line-height:0">
+                <h1>Stable Video Diffusion WebUI</h1>
+                <p>Upload an image to create a Video with the image.</p>
+            </div>
+            """
+# 设置gradio的头部信息
+# Set the header information of gradio

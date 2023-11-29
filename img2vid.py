@@ -1,6 +1,7 @@
-from setting import GR_SHARE, img_resize_to_HW, auto_adjust_img
+from setting import img_resize_to_HW, auto_adjust_img, HEAD_HTML
 from setting import auth
 from setting import creat_video_by_opencv
+from setting import gradio_args
 # if you want setting cuda device place ensure before 'from setting import *' position is first
 # 如果你希望设置cuda设备，请确保在'from setting import *'是第一位
 
@@ -187,10 +188,11 @@ def sample(
         min_W, min_H = auto_adjust_img.get('min_width', 256), auto_adjust_img.get('min_height', 256)
         max_W, max_H = auto_adjust_img.get('max_width', 1024), auto_adjust_img.get('max_height', 1024)
         re_W, re_H = img_resize_to_HW.get(' target_width', 1024), img_resize_to_HW.get('target_height', 576)
+        multiple_of_N=img_resize_to_HW.get('multiple_of_N',64)
         processing_functions = [
             {"func": enlarge_image, "args": (min_H, min_W)},
             {"func": shrink_image, "args": (max_W, max_H)},
-            {"func": crop_to_nearest_multiple_of_n, "args": (16,)},
+            {"func": crop_to_nearest_multiple_of_n, "args": (multiple_of_N,)},
         ]
         image = image_pipeline_func(input_img_path, processing_functions)
         if resize_image and image.size != (re_W, re_H):
@@ -369,6 +371,7 @@ else:
     auth_message = ''
 
 with gr.Blocks(title='Stable Video Diffusion WebUI', css='assets/style_custom.css') as demo:
+    gr.HTML(HEAD_HTML)  # add head html
     with gr.Row():
         image = gr.Image(label="input image", type="filepath", elem_id='img-box')
         video_out = gr.Video(label="generated video", elem_id='video-box')
@@ -391,6 +394,7 @@ with gr.Blocks(title='Stable Video Diffusion WebUI', css='assets/style_custom.cs
         debug=True,
         auth=auth,
         auth_message=auth_message,
-        share=GR_SHARE,
+        share=gradio_args.get('share', True),
+        show_api=gradio_args.get('show_api', True),
         show_error=True,
     )
