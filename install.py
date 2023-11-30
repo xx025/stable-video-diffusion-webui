@@ -8,8 +8,12 @@ def install_dependencies():
     try:
         # 克隆 generative-models 仓库
         repo_url = 'https://github.com/Stability-AI/generative-models.git'
-        tag_name = '0.1.0'
-        subprocess.run(['git', 'clone', '--branch', tag_name, repo_url])
+        commit_hash = 'e6f0e36f5e856d9651c597d75aed13ae7298d03b'
+        # 使用 subprocess.run 克隆存储库并切换到指定提交
+        subprocess.run(['git', 'clone', repo_url])
+        subprocess.run(['git', 'checkout', commit_hash], cwd='generative-models')  # 切换到指定提交
+        print(f"Repository cloned and checked out to commit {commit_hash}")
+
         # 从 requirements.txt 安装依赖项
         subprocess.run(['pip3', 'install', '-r', 'requirements.txt'])
         subprocess.run(['pip3', 'install', '-e', 'generative-models'])  # 安装 generative-models
