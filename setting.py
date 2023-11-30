@@ -58,3 +58,8 @@ creat_video_by_opencv = False
 # 使用opencv生成视频, 但是发现会有一些编码的问题，所以默认关闭，默认使用moviepy
 # Use opencv to generate video, but it is found that there will be some encoding problems,
 # so it is turned off by default,default use moviepy
+
+
+vid_output_folder = 'content/outputs'
+# 生成视频的输出文件夹
+# Output Folder for Generated Videos

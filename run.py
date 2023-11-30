@@ -1,18 +1,8 @@
-import os
 from setting import gradio_args as gr_args
-
-import shutil
-from scripts.util.detection.nsfw_and_watermark_dectection import RESOURCES_ROOT
-
-if not os.path.exists(RESOURCES_ROOT):
-    os.makedirs(RESOURCES_ROOT)
-f_real = os.path.join('generative-models', RESOURCES_ROOT)
-files = ['p_head_v1.npz', 'w_head_v1.npz']
-for f in files:
-    if not os.path.exists(os.path.join(RESOURCES_ROOT, f)):
-        shutil.copy(os.path.join(f_real, f), os.path.join(RESOURCES_ROOT, f))
+# 如果你要指定显卡，请确保setting 是第一位
 
 import gradio as gr
+
 from modules.model import infer
 from modules.model_setting import num_frames, num_steps
 

@@ -19,6 +19,7 @@ from modules.img_tool import enlarge_image, shrink_image, crop_to_nearest_multip
 from modules.model_setting import device, model, filter_x
 from setting import creat_video_by_opencv
 from setting import img_resize_to_HW, auto_adjust_img
+from setting import vid_output_folder
 
 
 def get_unique_embedder_keys_from_conditioner(conditioner):
@@ -250,6 +251,7 @@ def infer(input_path: str, resize_image: bool, n_frames: int, n_steps: int, seed
     if seed == "random":
         seed = random.randint(0, 2 ** 32)
     seed = int(seed)
+    output_folder = vid_output_folder
     output_paths = sample(
         input_path=input_path,
         resize_image=resize_image,
@@ -261,6 +263,6 @@ def infer(input_path: str, resize_image: bool, n_frames: int, n_steps: int, seed
         seed=23,
         decoding_t=decoding_t,  # Number of frames decoded at a time! This eats most VRAM. Reduce if necessary.
         device=device,
-        output_folder='content/outputs'  # 修改路径
+        output_folder=output_folder  #
     )
     return output_paths[0]
