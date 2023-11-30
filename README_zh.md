@@ -65,7 +65,7 @@ python run.py
 
 ---
 
-![image](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/ced032dd-3dda-4440-b72e-3f281d146e56)
+![捕获](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/01750957-a9b4-4d28-9938-578336c2fa90)
 
 
 **说明**
