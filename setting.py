@@ -63,3 +63,19 @@ creat_video_by_opencv = False
 vid_output_folder = 'content/outputs'
 # 生成视频的输出文件夹
 # Output Folder for Generated Videos
+
+
+infer_args = dict(
+    default_fps=6,
+    # 默认的视频帧率
+    # Default video fps
+    nsfw_filter_checkbox=dict(
+        enable=True,
+        default=True
+    )
+    # 是否可以跳过nsfw过滤, 默认打开此选择,
+    # 简而言之小心别人用你部署的服务推理不良内容，建议enable=False 关掉这个选项 并且设置default=False
+    # Whether nsfw filtering can be skipped
+)
+# 推理参数
+# Inference parameters

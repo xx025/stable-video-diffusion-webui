@@ -79,6 +79,7 @@ def sample(
         decoding_t: int = 14,  # Number of frames decoded at a time! This eats most VRAM. Reduce if necessary.
         device: str = "cuda",
         output_folder: Optional[str] = "/content/outputs",
+        skip_filter: bool = False
 ):
     """
     Simple script to generate a single sample conditioned on an image `input_path` or multiple images, one for each
@@ -222,7 +223,12 @@ def sample(
                 video_path = os.path.join(output_folder, f"{base_count:06d}.mp4")
 
                 samples = embed_watermark(samples)
-                samples = filter_x(samples)
+                if not skip_filter:
+                    samples = filter_x(samples)
+                else:
+                    print("WARNING: You have disabled the NSFW/Watermark filter. "
+                          "Please do not expose unfiltered results in services or applications open to the public.")
+
                 vid = (
                     (rearrange(samples, "t c h w -> t h w c") * 255)
                     .cpu()
@@ -234,7 +240,7 @@ def sample(
                     writer = cv2.VideoWriter(
                         video_path,
                         cv2.VideoWriter_fourcc(*"mp4v"),
-                        fps_id + 1,
+                        fps_id + 1,  #
                         (samples.shape[-1], samples.shape[-2]),
                     )
                     for frame in vid:
@@ -242,12 +248,22 @@ def sample(
                         writer.write(frame)
                     writer.release()
                 else:
-                    create_video(vid, video_path, fps_id + 1)
+                    create_video(vid, video_path, fps_id)
                 all_out_paths.append(video_path)
     return all_out_paths
 
 
-def infer(input_path: str, resize_image: bool, n_frames: int, n_steps: int, seed: str, decoding_t: int) -> str:
+def infer(
+        input_path: str,
+        resize_image: bool,
+        n_frames: int,
+        n_steps: int,
+        seed: str,
+        decoding_t: int,
+        fps_id: int,
+        motion_bucket_id: int,
+        cond_aug: float,
+        skip_filter: bool = False) -> str:
     if seed == "random":
         seed = random.randint(0, 2 ** 32)
     seed = int(seed)
@@ -257,12 +273,13 @@ def infer(input_path: str, resize_image: bool, n_frames: int, n_steps: int, seed
         resize_image=resize_image,
         num_frames=n_frames,
         num_steps=n_steps,
-        fps_id=6,
-        motion_bucket_id=127,
-        cond_aug=0.02,
-        seed=23,
+        fps_id=fps_id,
+        motion_bucket_id=motion_bucket_id,
+        cond_aug=cond_aug,
+        seed=seed,
         decoding_t=decoding_t,  # Number of frames decoded at a time! This eats most VRAM. Reduce if necessary.
         device=device,
-        output_folder=output_folder  #
+        output_folder=output_folder,
+        skip_filter=skip_filter,
     )
     return output_paths[0]
