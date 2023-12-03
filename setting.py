@@ -3,8 +3,8 @@ import os
 # 首次运行需要从Hugging Face下载ClIP模型等 也需要设置代理
 # 设置自己的 http代理
 # This config about proxy only for China
-# os.environ['http_proxy'] = 'http://127.0.0.1:2233/'
-# os.environ['https_proxy'] = 'http://127.0.0.1:2233/'
+# os.environ['http_proxy'] = 'http://127.0.0.1:7890/'
+# os.environ['https_proxy'] = 'http://127.0.0.1:7890/'
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 # 指定英伟达显卡
