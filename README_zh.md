@@ -19,7 +19,7 @@
 
 ## 准备
 
-一种代理设置方法：[使用xshell 隧道让服务器通过本地代理上网](https://github.com/xx025/stable-video-diffusion-webui/wiki/%E4%BD%BF%E7%94%A8xshell-%E9%9A%A7%E9%81%93%E8%AE%A9%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%9A%E8%BF%87%E6%9C%AC%E5%9C%B0%E4%BB%A3%E7%90%86%E4%B8%8A%E7%BD%91)
+
 
 ```shelll
 git clone https://github.com/xx025/stable-video-diffusion-webui.git
@@ -35,6 +35,7 @@ conda activate svd
 
 然后依次执行以下命令，
 > 很有可能在这个过程中你需要流畅的访问国际网络的上网环境,请合理配置代理
+> 一种代理设置方法：[使用xshell 隧道让服务器通过本地代理上网](https://github.com/xx025/stable-video-diffusion-webui/wiki/%E4%BD%BF%E7%94%A8xshell-%E9%9A%A7%E9%81%93%E8%AE%A9%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%9A%E8%BF%87%E6%9C%AC%E5%9C%B0%E4%BB%A3%E7%90%86%E4%B8%8A%E7%BD%91)
 
 ```shell
 
