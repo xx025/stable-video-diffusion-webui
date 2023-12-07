@@ -11,9 +11,9 @@
 
 
 
-## Docker 使用
+## AutoDl平台Docker 使用
 
-这样你不需要直接安装了，[Docker](https://www.codewithgpu.com/i/xx025/stable-video-diffusion-webui/stable-video-diffusion-webui)
+这样你不需要安装了，[Docker](https://www.codewithgpu.com/i/xx025/stable-video-diffusion-webui/stable-video-diffusion-webui)
 
 
 
