@@ -6,9 +6,9 @@ import os
 # os.environ['http_proxy'] = 'http://127.0.0.1:7890/'
 # os.environ['https_proxy'] = 'http://127.0.0.1:7890/'
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-# 指定英伟达显卡
-# Specify the NVIDIA GPU to use
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# 指定英伟达显卡，序号从0开始
+# Specify the NVIDIA GPU to use，the serial number starts from 0
 
 
 gradio_args = dict(
