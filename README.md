@@ -59,6 +59,12 @@ Please check settings.py and make modifications.
 ![捕获](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/01750957-a9b4-4d28-9938-578336c2fa90)
 
 
+## Communicate Group
+
+> Only for China users
+
+<img src="https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/2608e9c2-c641-4932-9244-90eec2e9d8f5" width = "400" />
+
 **Note**
 
 This library is modified from [url](https://github.com/mkshing/notebooks/blob/main/stable_video_diffusion_img2vid.ipynb), which is the colab version of stable-video-diffusion.

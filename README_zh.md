@@ -5,9 +5,10 @@
 
 
 
-|![284758167-367a25d8-8d7b-42d3-8391-6d82813c7b0f](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/00a0be47-a6e6-4c77-9bbc-ff8b5d899cfe) |![000003](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/8f53ac31-04fe-4e78-bbe0-625e690267cc) |
+|![b48a6c775c944f7d89043ab8e0154197](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/0fa07557-10b8-4e64-b287-13d246170fc9) | ![000009](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/7984eb26-ae83-4f22-8e71-5cda2e8be708)|
 |---------------------------------|----------------------------------|
 | img                     | videos                      |
+
 
 
 
@@ -71,6 +72,14 @@ python run.py
 ![捕获](https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/01750957-a9b4-4d28-9938-578336c2fa90)
 
 
+## 交流社群
+
+<img src="https://github.com/xx025/stable-video-diffusion-webui/assets/71559822/2608e9c2-c641-4932-9244-90eec2e9d8f5" width = "400" />
+
+
 **说明**
 
 这个库来修改自 [url](https://github.com/mkshing/notebooks/blob/main/stable_video_diffusion_img2vid.ipynb)  , 它是 stable-video-diffusion的 colab 版本
+
+
+
