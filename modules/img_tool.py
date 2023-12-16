@@ -127,7 +127,7 @@ def create_video(input_images, output_video_path, frames_per_second=30):
     clip = ImageSequenceClip(sorted([os.path.join(output_folder, frame) for frame in os.listdir(output_folder)]),
                              fps=frames_per_second)
     clip.write_videofile(output_video_path, codec="libx264")
-
+    clip.close() # 关闭视频文件
     # 删除保存的图片帧
     shutil.rmtree(output_folder)
 
